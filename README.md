@@ -1,6 +1,6 @@
 # swift-async-expectations
 
-AsyncExpectations is a testing library for Swift that brings structured concurrency testing to unstructured concurrency.
+AsyncExpectations is a testing library for Swift that brings structured testing to unstructured concurrency.
 
 ## Motivation
 Writing unit tests for structured concurrency is straightforward and simple.
