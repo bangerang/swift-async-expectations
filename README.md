@@ -175,7 +175,7 @@ If needed, we can easlily extend this list with additional expectations.
 
 ## Cancellation
 
-Unlike XCTest, AsyncExpectations will cancel the current task in the event of a test timeout. Failure to cancel the task could result in the current test run stalling if the task never completes.
+Unlike XCTest, AsyncExpectations will cancel the current task in the event of a test timeout. Failure to cancel the task could result in the current test run freezing if the task never completes.
 
 ## Installation
 
