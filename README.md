@@ -50,14 +50,14 @@ To write a test that passes we need to introduce a delay.
 
 ```swift
 func testSearch() async throws {
-  	let text = "Hello, is it me your looking for?"
-  	let viewModel = ViewModel(text: text, searchService: .init())
-  
-  	viewModel.searchText = "Hello"
-  	try await Task.sleep(until: .now + .seconds(0.2), clock: .continuous)
-  
-  	XCTAssertEqual(viewModel.searchResult.count, 1)
-  	XCTAssertEqual(text[viewModel.searchResult[0]], "Hello")
+    let text = "Hello, is it me your looking for?"
+    let viewModel = ViewModel(text: text, searchService: .init())
+
+    viewModel.searchText = "Hello"
+    try await Task.sleep(until: .now + .seconds(0.2), clock: .continuous)
+
+    XCTAssertEqual(viewModel.searchResult.count, 1)
+    XCTAssertEqual(text[viewModel.searchResult[0]], "Hello")
 }
 ```
 
