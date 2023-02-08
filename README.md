@@ -62,9 +62,37 @@ func testSearch() async throws {
 ```
 
 However, relying on arbitrary delays can make the test unreliable. Additionally, the test will run slower since it requires a wait time of at least 0.2 seconds.
-Another approach would be to use an `XCTestExpectation` instead, this would however require some more boilerplate code.
 
-With AsyncExpectations, we can simplify the process and remove the delay, resulting in improved test performance and reliability.
+Another more reliable approach would be to use Combine with an `XCTestExpectation`.
+```swift
+private var cancellables: Set<AnyCancellable>!
+
+override func setUp() {
+    super.setUp()
+    cancellables = []
+}
+
+func testSearch() {
+    let expectation = expectation(description: #function)
+    let text = "Hello, is it me your looking for?"
+    let viewModel = ViewModel(text: text, searchService: .init())
+    viewModel.$searchResult
+        .dropFirst()
+        .sink { searchResult in
+            XCTAssertEqual(searchResult.count, 1)
+            XCTAssertEqual(text[searchResult[0]], "Hello")
+            expectation.fulfill()
+        }
+        .store(in: &cancellables)
+
+    viewModel.searchText = "Hello"
+
+    wait(for: [expectation], timeout: 1)
+}
+```
+But this approach not only necessitates the use of more boilerplate code, but it also results in less readable code due to its non-linear nature. Furthermore, it requires us to maintain a reference to a cancellable object and perform necessary cleanup after each test.
+
+With AsyncExpectations, we can remove the delay and the boilerplate, resulting in much simpler code.
 
 ```swift
 func testSearch() async throws {
