@@ -46,7 +46,7 @@ class ViewModel: ObservableObject {
 }
 ```
 
-To write a test that passes we need to introduce a delay.
+To write a test that passes using async await we need to introduce a delay.
 
 ```swift
 func testSearch() async throws {
@@ -62,6 +62,7 @@ func testSearch() async throws {
 ```
 
 However, relying on arbitrary delays can make the test unreliable. Additionally, the test will run slower since it requires a wait time of at least 0.2 seconds.
+Another approach would be to use an `XCTestExpectation` instead, this would however require some more boilerplate code.
 
 With AsyncExpectations, we can simplify the process and remove the delay, resulting in improved test performance and reliability.
 
