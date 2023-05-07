@@ -208,5 +208,5 @@ Unlike XCTest, AsyncExpectations will cancel the current task in the event of a 
 
 ## Installation
 
-You can add AsyncExpectations as a package dependency `https://github.com/bangerang/swift-async-expectations`. Make sure you add it to your test target and not the main target.
+You can add AsyncExpectations as a package dependency `https://github.com/bangerang/swift-async-expectations`.
 
