@@ -1,6 +1,7 @@
 import Foundation
-import XCTest
+import XCTestDynamicOverlay
 import Combine
+import QuartzCore
 
 /// Expects an expression to be true.
 /// - Parameters:
