@@ -589,18 +589,18 @@ public func expectValue<T>(timeout: TimeInterval = 1,
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
 @discardableResult
-@MainActor public func expectValue<T: Publisher>(timeout: TimeInterval = 1,
-                                                 _ publisher: T,
-                                                 file: StaticString = #file,
-                                                 line: UInt = #line) async throws -> T.Output {
-    var value: T.Output?
+public func expectValue<T: Publisher>(timeout: TimeInterval = 1,
+                                      _ publisher: T,
+                                      file: StaticString = #file,
+                                      line: UInt = #line) async throws -> T.Output {
+    let value = LockIsolated<T.Output?>(nil)
     let cancellable = publisher.sink { _ in
     } receiveValue: { output in
-        value = output
+        value.setValue(output)
     }
     
-    let expression = { return value != nil }
-    if try await evaluate(expression, timeout: timeout), let value {
+    let expression = { @Sendable in return value.value != nil }
+    if try await evaluate(expression, timeout: timeout), let value = value.value {
         cancellable.cancel()
         return value
     } else {
@@ -645,4 +645,37 @@ public func evaluate(_ expression: @Sendable @escaping () async throws -> Bool,
         
     }
     return await status.isFulfilled
+}
+
+final class LockIsolated<Value>: @unchecked Sendable {
+  private var _value: Value
+  private let lock = NSRecursiveLock()
+
+  init(_ value: @autoclosure @Sendable () throws -> Value) rethrows {
+    self._value = try value()
+  }
+
+  func setValue(_ newValue: @autoclosure @Sendable () throws -> Value) rethrows {
+    try self.lock.sync {
+      self._value = try newValue()
+    }
+  }
+}
+
+extension LockIsolated where Value: Sendable {
+  /// The lock-isolated value.
+  var value: Value {
+    self.lock.sync {
+      self._value
+    }
+  }
+}
+
+extension NSRecursiveLock {
+  @inlinable @discardableResult
+  func sync<R>(work: () throws -> R) rethrows -> R {
+    self.lock()
+    defer { self.unlock() }
+    return try work()
+  }
 }
