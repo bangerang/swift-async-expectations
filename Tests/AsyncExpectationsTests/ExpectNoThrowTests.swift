@@ -26,7 +26,7 @@ final class ExpectNoThrowTests: XCTestCase {
         }
     }
     func testExpectNoThrowShouldSucceedAutoClosure() async throws {
-        func noThrow() async throws {
+        @Sendable func noThrow() async throws {
             try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
         }
         try await expectNoThrow {
