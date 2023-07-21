@@ -9,10 +9,10 @@ import QuartzCore
 ///   - expression: An expression of Boolean type.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expect(timeout: TimeInterval = 1,
-                              _ expression: @MainActor @escaping () async throws -> Bool,
-                              file: StaticString = #file,
-                              line: UInt = #line) async throws {
+public func expect(timeout: TimeInterval = 1,
+                   _ expression: @Sendable @escaping () async throws -> Bool,
+                   file: StaticString = #file,
+                   line: UInt = #line) async throws {
     if try await !evaluate(expression, timeout: timeout) {
         failExpect(file: file, line: line)
     }
@@ -23,10 +23,10 @@ import QuartzCore
 ///   - expression: An expression of Boolean type.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expect(timeout: TimeInterval = 1,
-                              _ expression: @escaping @autoclosure () throws -> Bool,
-                              file: StaticString = #file,
-                              line: UInt = #line) async throws {
+public func expect(timeout: TimeInterval = 1,
+                   _ expression: @Sendable @escaping @autoclosure () throws -> Bool,
+                   file: StaticString = #file,
+                   line: UInt = #line) async throws {
     if try await !evaluate(expression, timeout: timeout) {
         failExpect(file: file, line: line)
     }
@@ -41,11 +41,11 @@ private func failExpect(file: StaticString, line: UInt) {
 ///   - expression: An expression of Boolean type.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectFalse(timeout: TimeInterval = 1,
-                                   _ expression: @MainActor @escaping () async throws -> Bool,
-                                   file: StaticString = #file,
-                                   line: UInt = #line) async throws {
-    let inverted = { try await expression() != true }
+public func expectFalse(timeout: TimeInterval = 1,
+                        _ expression: @Sendable @escaping () async throws -> Bool,
+                        file: StaticString = #file,
+                        line: UInt = #line) async throws {
+    let inverted = { @Sendable in try await expression() != true }
     if try await !evaluate(inverted, timeout: timeout) {
         failExpecFalse(file: file, line: line)
     }
@@ -56,11 +56,11 @@ private func failExpect(file: StaticString, line: UInt) {
 ///   - expression: An expression of Boolean type.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectFalse(timeout: TimeInterval = 1,
-                                   _ expression: @escaping @autoclosure () throws -> Bool,
-                                   file: StaticString = #file,
-                                   line: UInt = #line) async throws {
-    let inverted = { try expression() != true }
+public func expectFalse(timeout: TimeInterval = 1,
+                        _ expression: @Sendable @escaping @autoclosure () throws -> Bool,
+                        file: StaticString = #file,
+                        line: UInt = #line) async throws {
+    let inverted = { @Sendable in try expression() != true }
     if try await !evaluate(inverted, timeout: timeout) {
         failExpecFalse(file: file, line: line)
     }
@@ -76,12 +76,12 @@ private func failExpecFalse(file: StaticString, line: UInt) {
 ///   - expression2: A second expression of type T, where T is Equatable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
-                                                 _ expression1: @escaping @autoclosure () throws -> T,
-                                                 _ expression2: @escaping @autoclosure () throws -> T,
-                                                 file: StaticString = #file,
-                                                 line: UInt = #line) async throws {
-    let expression = {
+public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
+                                      _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                      _ expression2: @Sendable @escaping @autoclosure () throws -> T,
+                                      file: StaticString = #file,
+                                      line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first == second
@@ -99,12 +99,12 @@ private func failExpecFalse(file: StaticString, line: UInt) {
 ///   - expression2: A second expression of type T, where T is Equatable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
-                                                 _ expression1: @MainActor @escaping () async throws -> T,
-                                                 _ expression2: @MainActor @escaping () async throws -> T,
-                                                 file: StaticString = #file,
-                                                 line: UInt = #line) async throws {
-    let expression = {
+public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
+                                      _ expression1: @Sendable @escaping () async throws -> T,
+                                      _ expression2: @Sendable @escaping () async throws -> T,
+                                      file: StaticString = #file,
+                                      line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first == second
@@ -126,12 +126,12 @@ private func failExpectEqual<T>(first: T, second: T, file: StaticString, line: U
 ///   - expression2: A second expression of type T, where T is Equatable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
-                                                    _ expression1: @escaping @autoclosure () throws -> T,
-                                                    _ expression2: @escaping @autoclosure () throws -> T,
-                                                    file: StaticString = #file,
-                                                    line: UInt = #line) async throws {
-    let expression = {
+public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
+                                         _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                         _ expression2: @Sendable @escaping @autoclosure () throws -> T,
+                                         file: StaticString = #file,
+                                         line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first != second
@@ -149,12 +149,12 @@ private func failExpectEqual<T>(first: T, second: T, file: StaticString, line: U
 ///   - expression2: A second expression of type T, where T is Equatable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
-                                                    _ expression1: @MainActor @escaping () async throws -> T,
-                                                    _ expression2: @MainActor @escaping () async throws -> T,
-                                                    file: StaticString = #file,
-                                                    line: UInt = #line) async throws {
-    let expression = {
+public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
+                                         _ expression1: @Sendable @escaping () async throws -> T,
+                                         _ expression2: @Sendable @escaping () async throws -> T,
+                                         file: StaticString = #file,
+                                         line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first != second
@@ -175,11 +175,11 @@ private func failExpectNotEqual<T>(first: T, second: T, file: StaticString, line
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNotNil<T>(timeout: TimeInterval = 1,
-                                       _ expression: @escaping @autoclosure () throws -> T?,
-                                       file: StaticString = #file,
-                                       line: UInt = #line) async throws {
-    let expression = { return try expression() != nil }
+public func expectNotNil<T>(timeout: TimeInterval = 1,
+                            _ expression: @Sendable @escaping @autoclosure () throws -> T?,
+                            file: StaticString = #file,
+                            line: UInt = #line) async throws {
+    let expression = { @Sendable in return try expression() != nil }
     if try await !evaluate(expression, timeout: timeout) {
         failExpectNotNil(file: file, line: line)
     }
@@ -190,11 +190,11 @@ private func failExpectNotEqual<T>(first: T, second: T, file: StaticString, line
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNotNil<T>(timeout: TimeInterval = 1,
-                                       _ expression: @MainActor @escaping () async throws -> T?,
-                                       file: StaticString = #file,
-                                       line: UInt = #line) async throws {
-    let expression = { return try await expression() != nil }
+public func expectNotNil<T>(timeout: TimeInterval = 1,
+                            _ expression: @Sendable @escaping () async throws -> T?,
+                            file: StaticString = #file,
+                            line: UInt = #line) async throws {
+    let expression = { @Sendable in return try await expression() != nil }
     if try await !evaluate(expression, timeout: timeout) {
         failExpectNotNil(file: file, line: line)
     }
@@ -209,11 +209,11 @@ private func failExpectNotNil(file: StaticString, line: UInt) {
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNil<T>(timeout: TimeInterval = 1,
-                                    _ expression: @escaping @autoclosure () throws -> T?,
-                                    file: StaticString = #file,
-                                    line: UInt = #line) async throws {
-    let expression = { return try expression() == nil }
+public func expectNil<T>(timeout: TimeInterval = 1,
+                         _ expression: @Sendable @escaping @autoclosure () throws -> T?,
+                         file: StaticString = #file,
+                         line: UInt = #line) async throws {
+    let expression = { @Sendable in return try expression() == nil }
     if try await !evaluate(expression, timeout: timeout) {
         failExpectNil(file: file, line: line)
     }
@@ -224,11 +224,11 @@ private func failExpectNotNil(file: StaticString, line: UInt) {
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNil<T>(timeout: TimeInterval = 1,
-                                    _ expression: @MainActor @escaping () async throws -> T?,
-                                    file: StaticString = #file,
-                                    line: UInt = #line) async throws {
-    let expression = { return try await expression() == nil }
+public func expectNil<T>(timeout: TimeInterval = 1,
+                         _ expression: @Sendable @escaping () async throws -> T?,
+                         file: StaticString = #file,
+                         line: UInt = #line) async throws {
+    let expression = { @Sendable in return try await expression() == nil }
     if try await !evaluate(expression, timeout: timeout) {
         failExpectNil(file: file, line: line)
     }
@@ -244,12 +244,12 @@ private func failExpectNil(file: StaticString, line: UInt) {
 ///   - errorHandler: An optional error handler.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectThrowsError<T>(timeout: TimeInterval = 1,
-                                            _ expression:  @escaping @autoclosure () throws -> T,
-                                            errorHandler: ((Error) -> Void)? = nil,
-                                            file: StaticString = #file,
-                                            line: UInt = #line) async throws {
-    let expression = {
+public func expectThrowsError<T>(timeout: TimeInterval = 1,
+                                 _ expression:  @Sendable @escaping @autoclosure () throws -> T,
+                                 errorHandler: ((Error) -> Void)? = nil,
+                                 file: StaticString = #file,
+                                 line: UInt = #line) async throws {
+    let expression = { @Sendable in
         do {
             _ = try expression()
             return false
@@ -269,12 +269,12 @@ private func failExpectNil(file: StaticString, line: UInt) {
 ///   - errorHandler: An optional error handler.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectThrowsError<T>(timeout: TimeInterval = 1,
-                                            _ expression: @MainActor @escaping () async throws -> T,
-                                            errorHandler: ((Error) -> Void)? = nil,
-                                            file: StaticString = #file,
-                                            line: UInt = #line) async throws {
-    let expression = {
+public func expectThrowsError<T>(timeout: TimeInterval = 1,
+                                 _ expression: @Sendable @escaping () async throws -> T,
+                                 errorHandler: ((Error) -> Void)? = nil,
+                                 file: StaticString = #file,
+                                 line: UInt = #line) async throws {
+    let expression = { @Sendable in
         do {
             _ = try await expression()
             return false
@@ -297,11 +297,11 @@ private func failExpectThrowsError(file: StaticString, line: UInt) {
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNoThrow<T>(timeout: TimeInterval = 1,
-                                        _ expression: @autoclosure @escaping () throws -> T,
-                                        file: StaticString = #file,
-                                        line: UInt = #line) async throws {
-    let expression = {
+public func expectNoThrow<T>(timeout: TimeInterval = 1,
+                             _ expression: @autoclosure @escaping () throws -> T,
+                             file: StaticString = #file,
+                             line: UInt = #line) async throws {
+    let expression = { @Sendable in
         do {
             _ = try expression()
             return true
@@ -319,11 +319,11 @@ private func failExpectThrowsError(file: StaticString, line: UInt) {
 ///   - expression: An expression of type T.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectNoThrow<T>(timeout: TimeInterval = 1,
-                                        _ expression: @MainActor @escaping () async throws -> T,
-                                        file: StaticString = #file,
-                                        line: UInt = #line) async throws {
-    let expression = {
+public func expectNoThrow<T>(timeout: TimeInterval = 1,
+                             _ expression: @Sendable @escaping () async throws -> T,
+                             file: StaticString = #file,
+                             line: UInt = #line) async throws {
+    let expression = { @Sendable in
         do {
             _ = try await expression()
             return true
@@ -346,12 +346,12 @@ private func failExpectNoThrow(file: StaticString, line: UInt) {
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
-                                                     _ expression1: @escaping @autoclosure () throws -> T,
-                                                     _ expression2: @escaping @autoclosure () throws -> T,
-                                                     file: StaticString = #file,
-                                                     line: UInt = #line) async throws {
-    let expression = {
+public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
+                                          _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                          _ expression2: @Sendable @escaping @autoclosure () throws -> T,
+                                          file: StaticString = #file,
+                                          line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first < second
@@ -369,12 +369,12 @@ private func failExpectNoThrow(file: StaticString, line: UInt) {
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
-                                                     _ expression1: @MainActor @escaping () async throws -> T,
-                                                     _ expression2: @MainActor @escaping () async throws -> T,
-                                                     file: StaticString = #file,
-                                                     line: UInt = #line) async throws {
-    let expression = {
+public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
+                                          _ expression1: @Sendable @escaping () async throws -> T,
+                                          _ expression2: @Sendable @escaping () async throws -> T,
+                                          file: StaticString = #file,
+                                          line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first < second
@@ -396,12 +396,12 @@ private func failExpectLessThan<T>(first: T, second: T, file: StaticString, line
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
-                                                            _ expression1: @escaping @autoclosure () throws -> T,
-                                                            _ expression2: @escaping  @autoclosure () throws -> T,
-                                                            file: StaticString = #file,
-                                                            line: UInt = #line) async throws {
-    let expression = {
+public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
+                                                 _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                                 _ expression2: @escaping  @autoclosure () throws -> T,
+                                                 file: StaticString = #file,
+                                                 line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first <= second
@@ -419,12 +419,12 @@ private func failExpectLessThan<T>(first: T, second: T, file: StaticString, line
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
-                                                            _ expression1: @MainActor @escaping () async throws -> T,
-                                                            _ expression2: @MainActor @escaping () async throws -> T,
-                                                            file: StaticString = #file,
-                                                            line: UInt = #line) async throws {
-    let expression = {
+public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
+                                                 _ expression1: @Sendable @escaping () async throws -> T,
+                                                 _ expression2: @Sendable @escaping () async throws -> T,
+                                                 file: StaticString = #file,
+                                                 line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first <= second
@@ -446,12 +446,12 @@ private func failExpectLessThanOrEqual<T>(first: T, second: T, file: StaticStrin
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
-                                                        _ expression1: @escaping @autoclosure () throws -> T,
-                                                        _ expression2: @escaping  @autoclosure () throws -> T,
-                                                        file: StaticString = #file,
-                                                        line: UInt = #line) async throws {
-    let expression = {
+public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
+                                             _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                             _ expression2: @escaping  @autoclosure () throws -> T,
+                                             file: StaticString = #file,
+                                             line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first > second
@@ -469,12 +469,12 @@ private func failExpectLessThanOrEqual<T>(first: T, second: T, file: StaticStrin
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
-                                                        _ expression1: @MainActor @escaping () async throws -> T,
-                                                        _ expression2: @MainActor @escaping () async throws -> T,
-                                                        file: StaticString = #file,
-                                                        line: UInt = #line) async throws {
-    let expression = {
+public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
+                                             _ expression1: @Sendable @escaping () async throws -> T,
+                                             _ expression2: @Sendable @escaping () async throws -> T,
+                                             file: StaticString = #file,
+                                             line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first > second
@@ -496,12 +496,12 @@ private func failExpectGreaterThan<T>(first: T, second: T, file: StaticString, l
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
-                                                               _ expression1: @escaping @autoclosure () throws -> T,
-                                                               _ expression2: @escaping @autoclosure () throws -> T,
-                                                               file: StaticString = #file,
-                                                               line: UInt = #line) async throws {
-    let expression = {
+public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
+                                                    _ expression1: @Sendable @escaping @autoclosure () throws -> T,
+                                                    _ expression2: @Sendable @escaping @autoclosure () throws -> T,
+                                                    file: StaticString = #file,
+                                                    line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try expression1()
         let second = try expression2()
         return first >= second
@@ -519,12 +519,12 @@ private func failExpectGreaterThan<T>(first: T, second: T, file: StaticString, l
 ///   - expression2: A second expression of type T, where T is Comparable.
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@MainActor public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
-                                                               _ expression1: @MainActor @escaping () async throws -> T,
-                                                               _ expression2: @MainActor @escaping () async throws -> T,
-                                                               file: StaticString = #file,
-                                                               line: UInt = #line) async throws {
-    let expression = {
+public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
+                                                    _ expression1: @Sendable @escaping () async throws -> T,
+                                                    _ expression2: @Sendable @escaping () async throws -> T,
+                                                    file: StaticString = #file,
+                                                    line: UInt = #line) async throws {
+    let expression = { @Sendable in
         let first = try await expression1()
         let second = try await expression2()
         return first >= second
@@ -546,11 +546,11 @@ private func failExpectGreaterThanOrEqual<T>(first: T, second: T, file: StaticSt
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
 @discardableResult
-@MainActor public func expectValue<T>(timeout: TimeInterval = 1,
-                                      _ expression: @MainActor @escaping () async throws -> T?,
-                                      file: StaticString = #file,
-                                      line: UInt = #line) async throws -> T {
-    let expressionToSend = {
+public func expectValue<T>(timeout: TimeInterval = 1,
+                           _ expression: @Sendable @escaping () async throws -> T?,
+                           file: StaticString = #file,
+                           line: UInt = #line) async throws -> T? {
+    let expressionToSend = { @Sendable in
         try await expression() != nil
     }
     if try await evaluate(expressionToSend, timeout: timeout) {
@@ -567,11 +567,11 @@ private func failExpectGreaterThanOrEqual<T>(first: T, second: T, file: StaticSt
 ///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you call this function.
 @discardableResult
-@MainActor public func expectValue<T>(timeout: TimeInterval = 1,
-                                      _ expression: @escaping @autoclosure () throws -> T?,
-                                      file: StaticString = #file,
-                                      line: UInt = #line) async throws -> T {
-    let expressionToSend = {
+public func expectValue<T>(timeout: TimeInterval = 1,
+                           _ expression: @Sendable @escaping @autoclosure () throws -> T?,
+                           file: StaticString = #file,
+                           line: UInt = #line) async throws -> T {
+    let expressionToSend = { @Sendable in
         try expression() != nil
     }
     if try await evaluate(expressionToSend, timeout: timeout) {
@@ -581,50 +581,7 @@ private func failExpectGreaterThanOrEqual<T>(first: T, second: T, file: StaticSt
         throw ExpectValueFailed()
     }
 }
-/// Expects the expression to return a value.
-/// - Parameters:
-///   - timeout: The amount of time to wait before recording a test failure.
-///   - expression: An expression of type T.
-///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
-///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@discardableResult
-@MainActor public func expectValue<T>(timeout: TimeInterval = 1,
-                                      _ expression: @MainActor @escaping () async throws -> T,
-                                      file: StaticString = #file,
-                                      line: UInt = #line) async throws -> T {
-    let expressionToSend = {
-        _ = try await expression()
-        return true
-    }
-    if try await evaluate(expressionToSend, timeout: timeout) {
-        return try await expression()
-    } else {
-        failExpectValue(file: file, line: line)
-        throw ExpectValueFailed()
-    }
-}
-/// Expects the expression to return a value.
-/// - Parameters:
-///   - timeout: The amount of time to wait before recording a test failure.
-///   - expression: An expression of type T.
-///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
-///   - line: The line number where the failure occurs. The default is the line number where you call this function.
-@discardableResult
-@MainActor public func expectValue<T>(timeout: TimeInterval = 1,
-                                      _ expression: @escaping @autoclosure () throws -> T,
-                                      file: StaticString = #file,
-                                      line: UInt = #line) async throws -> T {
-    let expressionToSend = {
-        _ = try expression()
-        return true
-    }
-    if try await evaluate(expressionToSend, timeout: timeout) {
-        return try expression()
-    } else {
-        failExpectValue(file: file, line: line)
-        throw ExpectValueFailed()
-    }
-}
+
 /// Expects the expression to return a value.
 /// - Parameters:
 ///   - timeout: The amount of time to wait before recording a test failure.
@@ -661,8 +618,8 @@ private func failExpectValue(file: StaticString, line: UInt) {
 /// - Parameters:
 ///   - expression: An expression of Boolean type.
 ///   - timeout: The amount of time to wait to evaluate the expression.
-@MainActor public func evaluate(_ expression: @MainActor @escaping () async throws -> Bool,
-                                timeout: TimeInterval) async throws -> Bool {
+public func evaluate(_ expression: @Sendable @escaping () async throws -> Bool,
+                     timeout: TimeInterval) async throws -> Bool {
     actor ExpressionStatus {
         var isFulfilled = false
         func setIsFulfilled() {
