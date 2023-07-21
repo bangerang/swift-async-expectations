@@ -2,30 +2,13 @@ import XCTest
 @testable import AsyncExpectations
 
 final class ExpectNotEqualTests: XCTestCase {
-    func testExpectNotEqualShouldFail() throws {
-        XCTExpectFailure {
-            let expectation = expectation(description: #function)
-            Task {
-                defer {
-                    expectation.fulfill()
-                }
-                try await expectNotEqual(timeout: 0.1, { 2 }, { 2 })
-            }
-            wait(for: [expectation], timeout: 1)
-            
-        }
+    func testExpectNotEqualShouldFail() async throws {
+        try await expectNotEqual(timeout: 0.1, { 2 }, { 2 })
+        XCTExpectFailure()
     }
-    func testExpectNotEqualShouldFailAutoClosure() throws {
-        XCTExpectFailure {
-            let expectation = expectation(description: #function)
-            Task {
-                defer {
-                    expectation.fulfill()
-                }
-                try await expectNotEqual(timeout: 0.1, 2, 2)
-            }
-            wait(for: [expectation], timeout: 1)
-        }
+    func testExpectNotEqualShouldFailAutoClosure() async throws {
+        try await expectNotEqual(timeout: 0.1, 2, 2)
+        XCTExpectFailure()
     }
     func testExpectNotEqualShouldSucceed() async throws {
         try await expectNotEqual(1, 2)
