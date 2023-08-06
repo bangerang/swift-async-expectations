@@ -82,9 +82,9 @@ public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
                                       file: StaticString = #file,
                                       line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first == second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first == second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -105,9 +105,9 @@ public func expectEqual<T: Equatable>(timeout: TimeInterval = 1,
                                       file: StaticString = #file,
                                       line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first == second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first == second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
@@ -132,9 +132,9 @@ public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
                                          file: StaticString = #file,
                                          line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first != second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first != second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -155,9 +155,9 @@ public func expectNotEqual<T: Equatable>(timeout: TimeInterval = 1,
                                          file: StaticString = #file,
                                          line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first != second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first != second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
@@ -352,9 +352,9 @@ public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
                                           file: StaticString = #file,
                                           line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first < second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first < second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -375,9 +375,9 @@ public func expectLessThan<T: Comparable>(timeout: TimeInterval = 1,
                                           file: StaticString = #file,
                                           line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first < second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first < second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
@@ -402,9 +402,9 @@ public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
                                                  file: StaticString = #file,
                                                  line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first <= second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first <= second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -425,9 +425,9 @@ public func expectLessThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
                                                  file: StaticString = #file,
                                                  line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first <= second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first <= second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
@@ -452,9 +452,9 @@ public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
                                              file: StaticString = #file,
                                              line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first > second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first > second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -475,9 +475,9 @@ public func expectGreaterThan<T: Comparable>(timeout: TimeInterval = 1,
                                              file: StaticString = #file,
                                              line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first > second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first > second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
@@ -502,9 +502,9 @@ public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
                                                     file: StaticString = #file,
                                                     line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try expression1()
-        let second = try expression2()
-        return first >= second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first >= second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try expression1()
@@ -525,9 +525,9 @@ public func expectGreaterThanOrEqual<T: Comparable>(timeout: TimeInterval = 1,
                                                     file: StaticString = #file,
                                                     line: UInt = #line) async throws {
     let expression = { @Sendable in
-        let first = try await expression1()
-        let second = try await expression2()
-        return first >= second
+        async let first = expression1()
+        async let second = expression2()
+        return try await first >= second
     }
     if try await !evaluate(expression, timeout: timeout) {
         let first = try await expression1()
