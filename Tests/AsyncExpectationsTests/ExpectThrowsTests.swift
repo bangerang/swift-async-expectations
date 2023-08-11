@@ -2,42 +2,26 @@ import XCTest
 @testable import AsyncExpectations
 
 final class ExpectThrowsTests: XCTestCase {
-    func testExpectThrowsShouldFail() throws {
+    func testExpectThrowsShouldFail() async throws {
         @Sendable func noThrow() async throws {}
-        XCTExpectFailure {
-            let expectation = expectation(description: #function)
-            Task {
-                defer {
-                    expectation.fulfill()
-                }
-                try await expectThrowsError(timeout: 0.1) {
-                    try await noThrow()
-                }
-            }
-            wait(for: [expectation], timeout: 1)
+        try await expectThrowsError(timeout: 0.1) {
+            try await noThrow()
         }
+        XCTExpectFailure()
     }
-    func testExpectThrowsShouldFailAutoClosure() throws {
+    func testExpectThrowsShouldFailAutoClosure() async throws {
         @Sendable func noThrow() throws {}
-        XCTExpectFailure {
-            let expectation = expectation(description: #function)
-            Task {
-                defer {
-                    expectation.fulfill()
-                }
-                try await expectThrowsError(timeout: 0.1, try noThrow())
-            }
-            wait(for: [expectation], timeout: 1)
-        }
+        try await expectThrowsError(timeout: 0.1, try noThrow())
+        XCTExpectFailure()
     }
     func testExpectThrowsShouldSucceed() async throws {
-        func funcThatThrows() throws {
+        @Sendable func funcThatThrows() throws {
             throw "Foo"
         }
         try await expectThrowsError(try funcThatThrows())
     }
     func testExpectThrowsShouldSucceedAutoClosure() async throws {
-        func funcThatThrows() async throws {
+        @Sendable func funcThatThrows() async throws {
             try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
             throw "Foo"
         }
