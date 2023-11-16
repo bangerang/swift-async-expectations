@@ -12,7 +12,7 @@ let package = Package(
             targets: ["AsyncExpectations"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0")
+        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.0.0")
     ],
     targets: [
         .target(
